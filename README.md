@@ -137,8 +137,11 @@ following variables will be used in each Roles of ansible
 # Reference Links
 
   https://github.com/kelseyhightower/kubernetes-the-hard-way
+
   https://www.joyent.com/blog/kubernetes-the-hard-way
+
   http://blog.sequenceiq.com/blog/2014/08/12/docker-networking/
+
   http://blog.arunsriraman.com/2017/02/how-to-setting-up-gre-or-vxlan-tunnel.html
     
 
