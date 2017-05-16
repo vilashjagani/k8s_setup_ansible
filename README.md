@@ -94,6 +94,24 @@ following variables will be used in each Roles of ansible
 
      #ansible-playbook -i hosts cluster_DNS_Add_on.yml
 
+   Login any node and check 
+     #kubectl get svc -n kube-system
+       This will show kube-dns service details
+
+     #kubectl get pod -n kube-system
+ 
+       This will show kube-dns pod details , this pod has 4 containers
+       To check DNS service is working or not, create one busybox pod
+
+     #kubectl run busybox  --image=busybox -- sleep 3600
+     #kubectl get pod -o wide
+        it will give details on which worker busybox pod is ruuning
+        Login in that worker and run that container and check nslokup
+    #docker exec -it contanier-id sh
+     nslookup kuberenetes.defaul.svc.cluster.local 
+        it should give 10.32.0.1 IP
+       
+
 11)smoke test 
 
     
