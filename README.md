@@ -94,7 +94,8 @@ following variables will be used in each Roles of ansible
 
      #ansible-playbook -i hosts cluster_DNS_Add_on.yml
 
-   Login any node and check 
+   Login any node and check
+ 
      #kubectl get svc -n kube-system
        This will show kube-dns service details
 
@@ -112,7 +113,27 @@ following variables will be used in each Roles of ansible
         it should give 10.32.0.1 IP
        
 
-11)smoke test 
+# 11)Smoke test
+
+ 
+  Login in any client
+     
+    #kubectl run nginx --image=nginx --port=80 --replicas=3
+    #kubectl get pods -o wide
+
+    #kubectl expose deployment nginx --type NodePort
+
+  Grab the NodePort that was setup for the nginx service:
+
+    #NODE_PORT=$(kubectl get svc nginx --output=jsonpath='{range .spec.ports[0]}{.nodePort}')
+
+  access nginix through internal and floating IP of worker
+
+    #curl http://worker01:${NODE_PORT}
+
+    #curl http://worker01-floatingip:${NODE_PORT}
+
+ 
 
     
 
