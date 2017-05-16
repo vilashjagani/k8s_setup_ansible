@@ -1,0 +1,10 @@
+---
+  - hosts: swarm
+    remote_user: root
+    
+
+    tasks:
+      - name: copy ssh_keys from ansible_host to remote
+        copy: 
+ 
+  

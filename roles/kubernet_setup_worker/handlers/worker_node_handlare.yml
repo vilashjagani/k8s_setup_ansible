@@ -1,0 +1,13 @@
+---
+  - name: Start the kubelet service
+    systemd:
+      name: kubelet
+      state: restarted
+      enabled: True
+      daemon_reload: yes
+  - name: Start the kube-proxy service
+    systemd:
+      name: kube-proxy
+      state: restarted
+      enabled: True
+      daemon_reload: yes

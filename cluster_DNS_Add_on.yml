@@ -1,0 +1,9 @@
+---
+  - hosts: controller0
+    remote_user: root
+    roles:
+      - cluster_DNS_Add_on
+
+    environment:
+      https_proxy: http://10.144.106.132:8678
+      http_proxy: http://10.144.106.132:8678

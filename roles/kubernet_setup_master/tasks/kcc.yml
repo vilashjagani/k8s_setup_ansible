@@ -1,0 +1,54 @@
+---
+  - name: create directory 
+    file:
+      path: /var/lib/kubernetes/
+      state: directory
+      mode: 0755
+    tags: 
+      - controller  
+ 
+  - name: copy token in place
+    shell: >
+           mv /root/token.csv /var/lib/kubernetes/;
+           mv ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem /var/lib/kubernetes/
+    tags: 
+      - controller  
+
+  - name: Download and install the Kubernetes controller binaries
+    shell: >
+           wget  https://storage.googleapis.com/kubernetes-release/release/v1.6.1/bin/linux/amd64/{{ item }} -O /usr/bin/{{ item }}; 
+           chmod 755 /usr/bin/{{ item }}
+    with_items:
+         - kube-apiserver
+         - kube-controller-manager
+         - kube-scheduler
+         - kubectl
+    tags: 
+      - controller
+
+  - name: Create the systemd unit file for kube-apiserver
+    template: 
+      src: kube-apiserver.service.j2
+      dest: /etc/systemd/system/kube-apiserver.service
+    notify: 
+      - Start the kube-apiserver service
+    tags:
+       - controller
+
+  - name: Create the systemd unit file for Kubernetes Controller Manager
+    template: 
+      src: kube-controller-manager.service.j2
+      dest: /etc/systemd/system/kube-controller-manager.service
+    notify: 
+      - Start the kube-controller-manager service
+    tags:
+       - controller
+
+  - name: Create the systemd unit file for Kubernetes Scheduler
+    template: 
+      src: kube-scheduler.service.j2
+      dest: /etc/systemd/system/kube-scheduler.service
+    notify: 
+      - Start the kube-scheduler service
+    tags:
+       - controller

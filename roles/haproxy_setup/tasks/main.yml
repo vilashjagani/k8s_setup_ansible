@@ -1,0 +1,38 @@
+---
+  - name: install software-properties-common 
+    apt: 
+      name: software-properties-common 
+      state: present
+      force: yes
+      update_cache: yes
+
+  - name: add repo for haproxy-1.6
+    shell: add-apt-repository ppa:vbernat/haproxy-1.6 
+
+  - name: install haproxy 
+    apt: 
+      name: haproxy
+      state: latest
+      force: yes
+      update_cache: yes
+  - name: copy certifacates for ssl for haproxy ssl support
+    copy: 
+      src: /etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{item}} 
+      dest: /etc/haproxy/{{item}}
+    with_items: 
+         - kubernetes.pem
+         - kubernetes-key.pem
+
+  - name: create pem certifcate for haproxy from private key and signed certificate
+    shell: >
+           cat /etc/haproxy/kubernetes-key.pem > /etc/haproxy/kubernetes1.pem;
+           cat /etc/haproxy/kubernetes.pem >> /etc/haproxy/kubernetes1.pem;
+  - name: configure haproxy.cfg file
+    template:
+      src: haproxy.cfg.j2
+      dest: /etc/haproxy/haproxy.cfg
+    notify: 
+      - Restart haproxy service
+
+        
+ 

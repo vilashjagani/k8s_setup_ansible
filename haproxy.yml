@@ -1,0 +1,10 @@
+---
+  - hosts: haproxy
+    remote_user: root
+    roles: 
+      - sshkey
+      - haproxy_setup
+
+    environment:
+      http_proxy: http://10.144.106.132:8678
+      https_proxy: http://10.144.106.132:8678

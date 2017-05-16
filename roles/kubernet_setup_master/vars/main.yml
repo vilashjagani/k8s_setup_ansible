@@ -1,0 +1,14 @@
+---
+lb_ip: 192.168.33.5
+ctl0_ip: 192.168.33.6
+ctl1_ip: 192.168.33.7
+ctl2_ip: 192.168.33.8
+cluster_ip_range: 10.32.0.0/24
+cluster_cidr: 10.200.0.0/16
+public_ip: 10.144.172.26
+cluster_dns: 10.32.0.10
+svc_ip: 10.32.0.1
+http_proxy: 10.144.106.132
+ctl0_h: controller0
+ctl1_h: controller01
+ctl2_h: controller02

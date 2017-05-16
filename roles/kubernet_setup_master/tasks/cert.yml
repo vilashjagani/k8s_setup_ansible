@@ -1,0 +1,11 @@
+---
+  - name: Distribute the TLS certificates on controller nodes
+    copy: src={{ item }} dest=/root/
+    with_items:
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca-key.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kubernetes-key.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kubernetes.pem
+         - /etc/ansible/roles/setting_up_TLS_RBAC/files/token.csv
+    tags:
+      - controller

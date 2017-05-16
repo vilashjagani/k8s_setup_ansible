@@ -1,0 +1,27 @@
+---
+  - name: install apt packages to configure repo
+    apt: name={{item}} state=latest  update_cache=yes force=yes
+    with_items:
+         - apt-transport-https
+         - ca-certificates
+         - curl
+         - software-properties-common
+
+  - name: Add Docker’s official GPG key
+    shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+  - name: Add stable repository in source.list
+    shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+ 
+  - name: Install the latest version of Docker
+    apt: name=docker-ce state=latest  update_cache=yes force=yes
+  
+  - name: insert proxy detail in docker to download images from Docker Hub through internet
+    lineinfile: 
+      path: /etc/default/docker
+      insertafter: '^#export'
+      line: 'export {{ item }}={{ http_proxy }}'
+    with_items:
+         - http_proxy
+         - https_proxy
+    notify: restart docker daemon 

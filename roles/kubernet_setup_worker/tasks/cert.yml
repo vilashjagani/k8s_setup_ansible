@@ -1,0 +1,11 @@
+---
+  - name: Distribute the TLS certificates on workers nodes
+    copy: src={{ item }} dest=/root/
+    with_items:
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kube-proxy.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kube-proxy-key.pem
+         - /etc/ansible/roles/setting_up_TLS_RBAC/files/bootstrap.kubeconfig
+         - /etc/ansible/roles/setting_up_TLS_RBAC/files/kube-proxy.kubeconfig
+    tags:
+      - worker

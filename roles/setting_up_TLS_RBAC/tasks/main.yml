@@ -1,0 +1,42 @@
+---
+  - name: Download and Install kubectl
+    get_url:
+      url: https://storage.googleapis.com/kubernetes-release/release/v1.6.1/bin/linux/amd64/kubectl 
+      dest: /usr/local/bin/kubectl
+      mode: 755
+
+  - name: Create the TLS Bootstrap Token
+    shell: >
+           BOOTSTRAP_TOKEN=$(head -c 16 /dev/urandom | od -An -t x | tr -d ' ');
+           echo $BOOTSTRAP_TOKEN,kubelet-bootstrap,10001,'"system:kubelet-bootstrap"' > /etc/ansible/roles/setting_up_TLS_RBAC/files/token.csv;
+           /usr/local/bin/kubectl config set-cluster kubernetes  --certificate-authority=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem \
+           --embed-certs=true --server=https://{{ public_ip }}:6443 --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/bootstrap.kubeconfig;
+           kubectl config set-credentials kubelet-bootstrap --token=${BOOTSTRAP_TOKEN} \
+           --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/bootstrap.kubeconfig;
+           kubectl config set-context default --cluster=kubernetes --user=kubelet-bootstrap \
+           --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/bootstrap.kubeconfig;
+           kubectl config use-context default --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/bootstrap.kubeconfig;
+  - name: Create the kube-proxy kubeconfig
+    shell: >
+           kubectl config set-cluster kubernetes \
+            --certificate-authority=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem\
+            --embed-certs=true \
+            --server=https://{{ public_ip }}:6443 \
+            --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/kube-proxy.kubeconfig;
+            kubectl config set-credentials kube-proxy \
+            --client-certificate=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/kube-proxy.pem \
+            --client-key=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/kube-proxy-key.pem \
+            --embed-certs=true \
+            --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/kube-proxy.kubeconfig;
+            kubectl config set-context default \
+            --cluster=kubernetes --user=kube-proxy \
+            --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/kube-proxy.kubeconfig;
+            kubectl config use-context default --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/kube-proxy.kubeconfig
+
+ 
+           
+          
+
+
+           
+       

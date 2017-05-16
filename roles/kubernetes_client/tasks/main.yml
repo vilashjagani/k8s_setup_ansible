@@ -1,0 +1,17 @@
+---
+  - name: Distribute the TLS admin certificates on workers nodes
+    copy: src={{ item }} dest=/root/
+    with_items:
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/admin.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/admin-key.pem
+  - name: Build up the kubeconfig entry
+    shell: >
+           kubectl config set-cluster kubernetes --certificate-authority=/root/ca.pem --embed-certs=true --server=https://{{public_ip}}:6443;
+           kubectl config set-credentials admin --client-certificate=/root/admin.pem --client-key=/root/admin-key.pem;
+           kubectl config set-context kubernetes --cluster=kubernetes --user=admin;
+           kubectl config use-context kubernetes;
+    ignore_errors: True
+    
+       
+ 

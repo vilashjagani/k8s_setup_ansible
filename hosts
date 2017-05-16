@@ -1,0 +1,10 @@
+[k8scontroller]
+controller0
+controller01
+controller02
+[k8sworker]
+worker01
+worker02
+worker03
+[haproxy]
+iperf02

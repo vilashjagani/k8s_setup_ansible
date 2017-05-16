@@ -1,0 +1,4 @@
+---
+  - include: cert.yml
+  - include: etcd.yml
+  - include: kcc.yml
