@@ -1,4 +1,5 @@
-Kubernetes cluster setup on Openstack VMs:
+
+# Kubernetes cluster setup on Openstack VMs:
 
 we will create six VMs cluster of k8s, 3 VMs will be setup as k8s controller/master and 3 will be setup as k8s worker/minion.
 one extra VM will be used as haproxy for LB with SSL certificate support.
@@ -43,43 +44,43 @@ Setup Steps:
  
 1) First Setup  sshkey for all VMs from ansible HOST
    
-   # ansible-playbook -i hosts sshkey.yml
+   #ansible-playbook -i hosts sshkey.yml
 
 2)  Setting up a CA and TLS Cert Generation
    
-   # ansible-playbook -i hosts kubernetes_CA_TLS.yml
+   #ansible-playbook -i hosts kubernetes_CA_TLS.yml
 
 3) Setting up TLS Client Bootstrap and RBAC Authentication
 
-   # ansible-platbook -i hosts kubernetes_TLS_RBAC.yml
+   #ansible-platbook -i hosts kubernetes_TLS_RBAC.yml
 
 4) setup haproxy with SSL certificate
    
-  # ansible-playbook -i hosts haproxy.yaml
+  #ansible-playbook -i hosts haproxy.yaml
   
 5) Bootstrapping a H/A etcd cluster and Kubernetes Control Plane
 
-   # ansible-playbook -i hosts kubernet_setup_master.yml
+   #ansible-playbook -i hosts kubernet_setup_master.yml
 
 6) setup kubctl client to check controller status
 
-   # ansible-playbook -i hosts -l controller0 kubernetes_client.yml
+   #ansible-playbook -i hosts -l controller0 kubernetes_client.yml
     
    Login controller0 node and run below command
    
-   # kubectl get status
+   #kubectl get status
 
   You can setup Kubernetes Client - on remaining controller nodes
 
 7)  Bootstrapping Kubernetes Workers
 
-   # ansible-playbook -i hosts kubernet_setup_worker.yml
+   #ansible-playbook -i hosts kubernet_setup_worker.yml
 
    Login in any one controller node where you set up kubectl client, list certificates of worker node and approve it
  
-   # kubectl get csr
+   #kubectl get csr
 
-   # kubectl certificate approve cert-ID
+   #kubectl certificate approve cert-ID
 
 8) Configuring the Kubernetes Client - Remote Access ( this will setup kubectl on all nodes)
 
@@ -87,11 +88,11 @@ Setup Steps:
 
 9)  create overlay network to talk PODs across worker nodes ( I have used VXLAN )
 
-    # ansible-playbook -i hosts container_network_routes.yml
+    #ansible-playbook -i hosts container_network_routes.yml
 
 10) Added cluster DNS add on in k8s cluster
 
-    # ansible-playbook -i hosts cluster_DNS_Add_on.yml
+    #ansible-playbook -i hosts cluster_DNS_Add_on.yml
 
 11) smoke test 
 
