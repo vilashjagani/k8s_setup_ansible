@@ -33,7 +33,7 @@ Architecture Details of kubernetes cluster
                                 #################################
                                       
 
-create six VMs ( RAM: 8GB , disk: 100GB , VCPUs: 4) in your openstack tenant or you can use any provisioning tool to create them.
+create six VMs ( RAM: 8GB , disk: 100GB , VCPUs: 4) in your openstack tenant, you can use any provisioning tool to create them.
       
        Hostname              Internal-IP           Floating/Public-IP
        controller0           192.168.33.6          XX.XX.XX.YY
