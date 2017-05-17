@@ -7,6 +7,32 @@ one extra VM will be used as haproxy for LB with SSL certificate support.
             VMs OS is : Ubuntu 16.04.02 TLS
             Kubernetes: v1.6.1
 
+
+Architecture Details of kubernetes cluster
+
+ There single or HA of kubernetes master/controller nodes and as many as worker/minion nodes
+                                     
+ 
+                                #################################  
+                                # Master Node has              #
+                                #   etcd                       #
+                                #   kube-apiserver             #
+                                #   kube-controller-manager    #
+                                #   kube-scheduler             #
+                                #                              #
+                                ################################
+
+
+                                #################################  
+                                #                               # 
+                                #       worker Node has         #
+                                #         docker                #
+                                #       kube-proxy              #
+                                #       kubelete                #
+                                #                               #
+                                #################################
+                                      
+
 create six VMs ( RAM: 8GB , disk: 100GB , VCPUs: 4) in your openstack tenant or you can use any provisioning tool to create them.
       
        Hostname              Internal-IP           Floating/Public-IP
