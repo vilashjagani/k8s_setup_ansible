@@ -15,6 +15,10 @@
       state: latest
       force: yes
       update_cache: yes
+
+  - name: enable bind for non-local ip
+    shell: echo 1 > /proc/sys/net/ipv4/ip_nonlocal_bind
+
   - name: copy certifacates for ssl for haproxy ssl support
     copy: 
       src: /etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{item}} 
