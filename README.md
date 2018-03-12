@@ -169,6 +169,10 @@ following variables will be used in each Roles of ansible
   http://blog.sequenceiq.com/blog/2014/08/12/docker-networking/
 
   http://blog.arunsriraman.com/2017/02/how-to-setting-up-gre-or-vxlan-tunnel.html
+  
+  storage glusterFS:
+  http://blog.leifmadsen.com/blog/2017/09/19/persistent-volumes-with-glusterfs/
+  http://dougbtv.com//nfvpe/2017/08/10/gluster-kubernetes/
     
 
 
