@@ -2,10 +2,6 @@
   - hosts: all
     remote_user: ubuntu
     sudo: yes
+    gather_facts: false
     roles:
       - sshkey
-
-
-    environment:
-      http_proxy: http://XX.XX.XX.XX:8678
-      https_proxy: http://XX.XX.XX.XX:8678

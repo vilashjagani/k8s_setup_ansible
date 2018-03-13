@@ -1,10 +1,8 @@
 [k8scontroller]
-controller0
-controller01
-controller02
+master01
+master02
+master03
 [k8sworker]
-worker01
-worker02
-worker03
-[haproxy]
-iperf02
+node01
+node02
+node03

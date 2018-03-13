@@ -4,7 +4,7 @@
 we will create six VMs cluster of k8s, 3 VMs will be setup as k8s controller/master and 3 will be setup as k8s worker/minion.
 one extra VM will be used as haproxy for LB with SSL certificate support.
 
-            VMs OS is : Ubuntu 16.04.02 TLS
+            VMs OS is : Ubuntu 16.04.02 TLS ( install OS with python-dev package)
             Kubernetes: v1.6.1
 
 
@@ -67,10 +67,17 @@ following variables will be used in each Roles of ansible
 	ctl2_h: controller02
 
 # Setup Steps:
+Prerquisites:
+  on Ansible host:
+   generate key 
+     
+         # ssh-keygen
+         #ssh-copy-id -i ~/.ssh/id_rsa.pub node01 ( copy your key in all machines)
+
  
-1)First Setup  sshkey for all VMs from ansible HOST
+1)First Setup  sshkey for root user for  all VMs from ansible HOST
    
-    #ansible-playbook -i hosts sshkey.yml
+    #ansible-playbook -i hosts sshkey.yml  --ask-sudo-pass
 
 2)Setting up a CA and TLS Cert Generation
    
