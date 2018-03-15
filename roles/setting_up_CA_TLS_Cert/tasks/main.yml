@@ -3,6 +3,7 @@
     get_url:
       url: https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
       dest: /usr/local/bin/cfssl
+      validate_certs: no
       mode: 755
     tags: 
       - localhost 
@@ -11,9 +12,19 @@
     get_url:
       url: https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
       dest: /usr/local/bin/cfssljson
+      validate_certs: no
       mode: 755
     tags: 
-      - localhost 
+      - localhost
+
+  - name: Install kubectl
+    get_url:
+      url: https://storage.googleapis.com/kubernetes-release/release/{{ kub_version }}/bin/linux/amd64/kubectl 
+      dest: /usr/local/bin/kubectl
+      validate_certs: no
+      mode: 755
+    tags:
+     - localhost
 
   - name: Set up a Certificate Authority ; will generate ca-key.pem and ca.pem files
     shell: >
@@ -25,15 +36,38 @@
   - name: Generate client and server TLS certificates will generate admin-key.pem admin.pem
     shell: >
            cd /etc/ansible/roles/setting_up_CA_TLS_Cert/files/;
-           /usr/local/bin/cfssl gencert  -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes \
+           /usr/local/bin/cfssl gencert  -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes 
            admin-csr.json | /usr/local/bin/cfssljson -bare admin
     tags: 
-      - localhost 
+      - localhost
 
+  - name: Generate a certificate and private key for each Kubernetes worker node
+    template:
+      src: workers-csr.j2
+      dest: /etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{ item }}.json
+    with_items:
+         - "{{ worker0_h }}"
+         - "{{ worker1_h }}"
+         - "{{ worker2_h }}"
+    tags:
+      - localhost
+  
+  - name: Create workers certificates , it will generate workerX-key.pem and workerX.pem 
+    shell: >
+          cd /etc/ansible/roles/setting_up_CA_TLS_Cert/files/;
+          /usr/local/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem  -config=ca-config.json -hostname={{ item.host }},{{ item.ip}} 
+          -profile=kubernetes {{ item.host }}.json | cfssljson -bare {{ item.host }}
+    with_items:
+         - { host: '{{ worker0_h }}', ip: '{{ worker0_ip }}'}
+         - { host: '{{ worker1_h }}', ip: '{{ worker1_ip }}'}
+         - { host: '{{ worker2_h }}', ip: '{{ worker2_ip }}'}
+    tags:
+      - localhost
+           
   - name: Create the kube-proxy client certificate will generate kube-proxy-key.pem kube-proxy.pem
     shell: >
           cd /etc/ansible/roles/setting_up_CA_TLS_Cert/files/;
-          /usr/local/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes \
+          /usr/local/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes 
           kube-proxy-csr.json | /usr/local/bin/cfssljson -bare kube-proxy
     tags: 
       - localhost
@@ -47,9 +81,9 @@
   - name: Create the kubernetes server certificate  will generate kubernetes-key.pem kubernetes.pem
     shell: >
            cd /etc/ansible/roles/setting_up_CA_TLS_Cert/files/;
-           /usr/local/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes \
+           /usr/local/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json 
+           -hostname={{ svc_ip }},{{ ctl0_ip }},{{ ctl1_ip }},{{ ctl2_ip }},{{ public_ip }},127.0.0.1,kubernetes.default -profile=kubernetes 
            kubernetes-csr.json | /usr/local/bin/cfssljson -bare kubernetes
             
     tags: 
-      - localhost 
-   
+      - localhost

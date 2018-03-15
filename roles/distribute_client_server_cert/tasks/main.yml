@@ -1,0 +1,20 @@
+---
+  - name: Copy the appropriate certificates and private keys to each worker instance
+    copy: src={{ item }} dest=/root/
+    with_items:
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{ inventory_hostname }}-key.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{ inventory_hostname }}.pem
+    tags: 
+      - k8sworker
+  
+  - name: Copy the appropriate certificates and private keys to each controller instance
+    copy: src={{ item }} dest=/root/
+    with_items:
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca-key.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kubernetes-key.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kubernetes.pem
+    tags: 
+      - k8scontroller
+    

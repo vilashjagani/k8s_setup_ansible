@@ -3,3 +3,5 @@
     file: path=/root/.ssh  state=directory
   - name: copy public key in authorized file to remote 
     copy: src=id_rsa.pub dest=/root/.ssh/authorized_keys mode=0600
+  - name: allowd sudo without password 
+    copy: src=sudoers dest=/etc/ mode=0440

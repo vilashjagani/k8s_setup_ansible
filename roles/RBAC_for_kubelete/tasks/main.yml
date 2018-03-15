@@ -1,0 +1,16 @@
+---
+  - name: copy RBAC_Clusterrole and ClusreRolebinding yaml files to master node
+    copy: src={{ item }} dest=/root/
+    with_items:
+         - /etc/ansible/roles/RBAC_for_kubelete/files/RBAC_ClusterRole.yml
+         - /etc/ansible/roles/RBAC_for_kubelete/files/RBAC_ClusterRoleBinding.yml
+  
+  - name: Create the system:kube-apiserver-to-kubelet ClusterRole with permissions to access the Kubelet API
+    shell: >
+           kubectl apply -f /root/RBAC_ClusterRole.yml;
+    ignore_errors: yes
+
+  - name: Bind the system:kube-apiserver-to-kubelet ClusterRole to the kubernetes user
+    shell: >
+           kubectl apply -f /root/RBAC_ClusterRoleBinding.yml;
+    ignore_errors: yes

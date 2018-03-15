@@ -1,23 +1,10 @@
 ---
-  - name: create directory 
-    file:
-      path: /var/lib/kubernetes/
-      state: directory
-      mode: 0755
-    tags: 
-      - controller  
- 
-  - name: copy token in place
-    shell: >
-           mv /root/token.csv /var/lib/kubernetes/;
-           mv ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem /var/lib/kubernetes/
-    tags: 
-      - controller  
-
   - name: Download and install the Kubernetes controller binaries
-    shell: >
-           wget  https://storage.googleapis.com/kubernetes-release/release/v1.6.1/bin/linux/amd64/{{ item }} -O /usr/bin/{{ item }}; 
-           chmod 755 /usr/bin/{{ item }}
+    get_url:
+      url: https://storage.googleapis.com/kubernetes-release/release/{{ kub_version }}/bin/linux/amd64/{{ item }}
+      dest: /usr/local/bin/
+      mode: 755
+      validate_certs: no
     with_items:
          - kube-apiserver
          - kube-controller-manager
@@ -26,6 +13,22 @@
     tags: 
       - controller
 
+  - name: create kubernetes data directory
+    file: path=/var/lib/kubernetes/ state=directory
+    tags: 
+      - controller
+  
+  - name: copy kuberenets certs in /var/lib/kubernetes dir
+    copy: src={{ item }} dest=/var/lib/kubernetes/
+    with_items:
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca-key.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kubernetes-key.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kubernetes.pem
+         - /etc/ansible/roles/setting_data_encryption_config_key/files/encryption-config.yaml
+    tags:
+       - controller
+    
   - name: Create the systemd unit file for kube-apiserver
     template: 
       src: kube-apiserver.service.j2

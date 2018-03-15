@@ -1,8 +1,8 @@
 [k8scontroller]
-master01
-master02
-master03
+master01  host_ip=192.168.44.10
+master02  host_ip=192.168.44.11
+master03  host_ip=192.168.44.12
 [k8sworker]
-node01
+node01 
 node02
 node03

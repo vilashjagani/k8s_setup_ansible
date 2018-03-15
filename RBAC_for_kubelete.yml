@@ -1,0 +1,8 @@
+---
+  - hosts: k8scontroller
+    remote_user: ubuntu
+    sudo: yes
+    vars_files:
+      - var_main.yml
+    roles:
+      - RBAC_for_kubelete

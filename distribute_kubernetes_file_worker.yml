@@ -1,0 +1,7 @@
+---
+  - hosts: k8sworker
+    remote_user: ubuntu
+    sudo: yes
+    roles:
+      - distribute_kubernetes_files_worker 
+

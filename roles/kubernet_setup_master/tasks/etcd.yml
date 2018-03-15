@@ -1,17 +1,41 @@
 ---
   - name: Provision the etcd Cluster
-    shell: >
-           mkdir -p /etc/etcd/;
-           cp /root/ca.pem /root/kubernetes-key.pem /root/kubernetes.pem /etc/etcd/;
+    file: path={{ item }} state=directory
+    with_items:
+         -  /etc/etcd/
+         - /var/lib/etcd
+    tags:
+      - controller
+
+  - name: copy certificates in /etc/etcd dir
+    copy: src={{ item }} dest=/etc/etcd/
+    with_items:
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kubernetes-key.pem
+         - /etc/ansible/roles/setting_up_CA_TLS_Cert/files/kubernetes.pem
     tags:
       - controller
  
-  - name: Download and Install the etcd binaries
+  - name: Download the etcd tar package
+    get_url:
+      url:  https://github.com/coreos/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz
+      dest: /root/
+      validate_certs: no
+    tags:
+      - controller
+
+  - name:  unarchive etcd cluster
+    unarchive:
+      src: /root/etcd-{{ etcd_version }}-linux-amd64.tar.gz
+      dest: /root/
+      remote_src: yes
+    tags:
+      - controller
+
+  - name: Install the etcd binaries 
     shell: >
-           wget https://github.com/coreos/etcd/releases/download/v3.1.4/etcd-v3.1.4-linux-amd64.tar.gz -O /root/etcd-v3.1.4-linux-amd64.tar.gz;
-           tar -xvf /root/etcd-v3.1.4-linux-amd64.tar.gz;
-           mv /root/etcd-v3.1.4-linux-amd64/etcd* /usr/bin/ ;
-           mkdir -p /var/lib/etcd;
+           cp /root/etcd-{{ etcd_version }}-linux-amd64/etcd* /usr/local/bin/
+    ignore_errors: yes
     tags:
       - controller
 

@@ -1,0 +1,20 @@
+---
+  - hosts: localhost
+    remote_user: ubuntu
+    sudo: yes
+    vars_files:
+      - var_main.yml
+    roles:
+      - setting_data_encryption_config_key
+  
+  - hosts: k8scontroller
+    remote_user: ubuntu
+    sudo: yes
+    vars_files:
+      - var_main.yml
+  
+    tasks:
+      - name: Copy the encryption-config.yaml encryption config file to each controller instance
+        copy: src=/etc/ansible/roles/setting_data_encryption_config_key/files/encryption-config.yaml dest=/root/
+             
+

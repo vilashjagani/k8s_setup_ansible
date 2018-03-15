@@ -82,10 +82,55 @@ Prerquisites:
 2)Setting up a CA and TLS Cert Generation
    
     #ansible-playbook -i hosts kubernetes_CA_TLS.yml
+    #sudo chown -R ubuntu:ubuntu /etc/ansible/roles/setting_up_CA_TLS_Cert/files
 
-3)Setting up TLS Client Bootstrap and RBAC Authentication
+3) Distribue certificats on worker nodes
+   
+    #ansible-playbook -i hosts -t k8sworker distribute_client_cert.yml
 
-    #ansible-platbook -i hosts kubernetes_TLS_RBAC.yml
+4) Distribue certificats on master nodes
+ 
+   #ansible-playbook -i hosts -t k8scontroller distribute_server_cert.yml
+   
+5)Setting up TLS Client Bootstrap and RBAC Authentication
+
+    #ansible-playbook -i hosts kubernetes_TLS_RBAC.yml
+    #sudo chown -R ubuntu:ubuntu /etc/ansible/roles/setting_up_TLS_RBAC/files
+
+6) Distribute the Kubernetes Configuration Files on worker nodes
+
+    #ansible-playbook -i hosts distribute_kubernetes_file_worker.yml
+
+7) Generating the Data Encryption Config and Key
+
+    #ansible-playbook -i hosts generate_data_encrypt_config_key.yml
+
+8) Bootstrapping the Kubernetes Control Plane
+
+   #ansible-playbook -i hosts kubernet_setup_master.yml
+
+
+  Afert this , chech etcd cluster status by login in any one master node
+
+  #etcdctl --ca-file /etc/etcd/ca.pem --cert-file /etc/etcd/kubernetes.pem --key-file /etc/etcd/kubernetes-key.pem cluster-health
+
+  #etcdctl --ca-file /etc/etcd/ca.pem --cert-file /etc/etcd/kubernetes.pem --key-file /etc/etcd/kubernetes-key.pem member list
+
+  Check status of kubernetes cluster
+
+  #kubectl get cs
+
+9) configure RBAC for Kubelet Authorization
+
+  #ansible-playbook -i hosts RBAC_for_kubelete.yml
+
+  After this , check clusteroles and clusterrolesbinding status by login in any one master node
+
+  #kubectl get clusterroles
+
+  #kubectl get clusterrolebindings
+
+
 
 4)setup haproxy with SSL certificate
    

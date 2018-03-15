@@ -1,0 +1,8 @@
+---
+  - name: opy the appropriate kubelet and kube-proxy kubeconfig files to each worker instance
+    copy: src={{ item }} dest=/root/
+    with_items:
+         - /etc/ansible/roles/setting_up_TLS_RBAC/files/kube-proxy.kubeconfig
+         - /etc/ansible/roles/setting_up_TLS_RBAC/files/{{ inventory_hostname }}.kubeconfig
+    tags: 
+      - k8sworker

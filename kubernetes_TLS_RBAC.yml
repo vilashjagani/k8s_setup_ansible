@@ -1,9 +1,6 @@
 ---
   - hosts: localhost
-    remote_user: root
+    remote_user: ubuntu
+    sudo: yes
     roles: 
       - setting_up_TLS_RBAC
-
-    environment:
-      http_proxy: http://XX.XX.XX.XX:8678
-      https_proxy: http://XX.XX.XX.XX:8678

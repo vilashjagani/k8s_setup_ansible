@@ -1,0 +1,7 @@
+---
+  - name: Generate Encryption Config File with Encryption Key
+    shell: head -c 32 /dev/urandom | base64
+    register: ENCRYPTION_KEY
+
+  - name: Generate file from template
+    template: src=encryption-config.j2 dest=/etc/ansible/roles/setting_data_encryption_config_key/files/encryption-config.yaml
