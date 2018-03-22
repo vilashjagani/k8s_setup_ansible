@@ -1,6 +1,8 @@
 ---
 kub_version: v1.9.0
 etcd_version: v3.2.11
+cni_version: v0.6.0
+cri_version: v1.0.0-beta.1
 lb_ip: 192.168.44.5
 ctl0_ip: 192.168.44.10
 ctl1_ip: 192.168.44.11

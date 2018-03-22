@@ -34,17 +34,25 @@ defaults
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
 
+listen statistics
+        bind *:8989
+        mode http
+        stats enable
+        stats uri /stats
+        stats realm HAProxy\ Statistics
+        stats auth admin:admin
+
 frontend  public-api
-    bind {{public_ip}}:6443 ssl crt /etc/haproxy/kubernetes1.pem
-    bind {{ansible_default_ipv4.address}}:6443 ssl crt /etc/haproxy/kubernetes1.pem
+    bind {{ public_ip }}:6443 ssl crt /etc/haproxy/kubernetes1.pem
+    #bind {{ lb_ip }}:6443 ssl crt /etc/haproxy/kubernetes1.pem
     default_backend    public-api-backend
 
 backend public-api-backend
     option nolinger
     balance     roundrobin
     option tcp-check
-    tcp-check connect port 8080
+    tcp-check connect port 6443
     default-server error-limit 1 on-error mark-down
-    server {{ctl0_ip}}  {{ctl0_ip}}:8080 check inter 2000 rise 2 fall 3
-    server {{ctl1_ip}}  {{ctl1_ip}}:8080 check inter 2000 rise 2 fall 3
-    server {{ctl2_ip}}  {{ctl2_ip}}:8080 check inter 2000 rise 2 fall 3
+    server {{ ctl0_ip }}  {{ ctl0_ip }}:6443 check ssl verify none inter 2000 rise 2 fall 3
+    server {{ ctl1_ip }}  {{ ctl1_ip }}:6443 check ssl verify none inter 2000 rise 2 fall 3
+    server {{ ctl2_ip }}  {{ ctl2_ip }}:6443 check ssl verify none inter 2000 rise 2 fall 3

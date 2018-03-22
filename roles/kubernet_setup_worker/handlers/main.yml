@@ -1,3 +1,2 @@
 ---
-  - include: docker_handlaer.yml
   - include: worker_node_handlare.yml

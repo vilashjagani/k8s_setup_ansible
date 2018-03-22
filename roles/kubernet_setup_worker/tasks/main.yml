@@ -1,3 +1,2 @@
 ---
-  - include: cert.yml
   - include: worker_nodes.yml

@@ -132,9 +132,13 @@ Prerquisites:
 
 
 
-4)setup haproxy with SSL certificate
+10)setup haproxy with SSL certificate and HA of haproxy with keepalived
    
     #ansible-playbook -i hosts haproxy.yaml
+
+    After this , check kube-api is accessable using LB_IP
+
+    #curl --cacert ca.pem https://${PUBLIC_ADDRESS}:6443/version
   
 5)Bootstrapping a H/A etcd cluster and Kubernetes Control Plane
 

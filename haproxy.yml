@@ -1,10 +1,8 @@
 ---
-  - hosts: haproxy
-    remote_user: root
+  - hosts: k8scontroller
+    remote_user: ubuntu
+    sudo: yes
+    vars_files:
+      - var_main.yml
     roles: 
-      - sshkey
       - haproxy_setup
-
-    environment:
-      http_proxy: http://XX.XX.XX.XX:8678
-      https_proxy: http://XX.XX.XX.XX:8678

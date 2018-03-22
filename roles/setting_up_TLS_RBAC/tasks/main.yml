@@ -1,11 +1,15 @@
 ---
   - name: Generate kubelet Kubernetes Configuration File
     shell: >
-           /usr/local/bin/kubectl config set-cluster kubernetes  --certificate-authority=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem --embed-certs           =true --server=https://{{ public_ip }}:6443 --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/{{ item }}.kubeconfig;
+           /usr/local/bin/kubectl config set-cluster kubernetes  --certificate-authority=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/ca.pem 
+           --embed-certs=true --server=https://{{ public_ip }}:6443 --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/{{ item }}.kubeconfig;
 
-           kubectl config set-credentials system:node:{{ item }} --client-certificate=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{ item }}.pem --client           -key=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{ item }}-key.pem --embed-certs=true --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/fil           es/{{ item }}.kubeconfig;
+           kubectl config set-credentials system:node:{{ item }} --client-certificate=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{ item }}.pem 
+           --client-key=/etc/ansible/roles/setting_up_CA_TLS_Cert/files/{{ item }}-key.pem --embed-certs=true 
+           --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/{{ item }}.kubeconfig;
  
-           kubectl config set-context default --cluster=kubernetes --user=system:node:{{ item }} --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/{{           item }}.kubeconfig;
+           kubectl config set-context default --cluster=kubernetes --user=system:node:{{ item }} 
+           --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/{{ item }}.kubeconfig;
            kubectl config use-context default --kubeconfig=/etc/ansible/roles/setting_up_TLS_RBAC/files/{{ item }}.kubeconfig
     with_items:
          - "{{ worker0_h }}"

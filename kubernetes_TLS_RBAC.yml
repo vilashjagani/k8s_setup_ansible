@@ -2,5 +2,7 @@
   - hosts: localhost
     remote_user: ubuntu
     sudo: yes
+    vars_files:
+      - var_main.yml
     roles: 
       - setting_up_TLS_RBAC

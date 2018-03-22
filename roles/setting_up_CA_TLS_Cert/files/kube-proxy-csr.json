@@ -1,6 +1,5 @@
 {
   "CN": "system:kube-proxy",
-  "hosts": [],
   "key": {
     "algo": "rsa",
     "size": 2048

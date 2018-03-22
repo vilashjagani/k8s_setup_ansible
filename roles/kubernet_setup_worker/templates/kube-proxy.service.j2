@@ -1,9 +1,9 @@
 [Unit]
 Description=Kubernetes Kube Proxy
-Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
-ExecStart=/usr/bin/kube-proxy --cluster-cidr={{cluster_cidr}} --masquerade-all=true --kubeconfig=/var/lib/kube-proxy/kube-proxy.kubeconfig --proxy-mode=iptables --v=2
+ExecStart=/usr/local/bin/kube-proxy --cluster-cidr={{ cluster_cidr }} --kubeconfig=/var/lib/kube-proxy/kubeconfig --proxy-mode=iptables --v=2
 Restart=on-failure
 RestartSec=5
 
