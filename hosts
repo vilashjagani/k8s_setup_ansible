@@ -4,5 +4,5 @@ master02  host_ip=192.168.44.11 host_ifc=enp0s8 host_priority=101 POD_CIDR=10.20
 master03  host_ip=192.168.44.12 host_ifc=enp0s8 host_priority=100 POD_CIDR=10.200.0.3/24
 [k8sworker]
 node01 POD_CIDR=10.200.0.1/24 
-#node02 POD_CIDR=10.200.0.2/24
-#node03 POD_CIDR=10.200.0.3/24
+node02 POD_CIDR=10.200.0.2/24
+node03 POD_CIDR=10.200.0.3/24

@@ -1,0 +1,29 @@
+---
+  - name: install software-properties-common 
+    apt: 
+      name: software-properties-common 
+      state: present
+      force: yes
+      update_cache: yes
+
+  - name: install keepalived 
+    apt: 
+      name: keepalived
+      state: latest
+      force: yes
+      update_cache: yes
+
+  - name: enable bind for non-local ip
+    sysctl:
+      name: net.ipv4.ip_nonlocal_bind
+      value: 1
+      sysctl_set: yes
+      state: present
+      reload: yes
+
+  - name: configure keepalived.conf file
+    template:
+      src: keepalived.conf.j2
+      dest: /etc/keepalived/keepalived.conf
+    notify: 
+      - Restart keepalived service

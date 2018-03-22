@@ -3,8 +3,8 @@ global_defs {
 lvs_id haproxy_DH
 }
 # Script used to check if HAProxy is running
-vrrp_script check_haproxy {
-script "killall -0 haproxy"
+vrrp_script check_kubeapi {
+script "killall -0 kube-apiserver"
 interval 2
 weight 2
 }
@@ -20,6 +20,6 @@ virtual_ipaddress {
 {{ lb_ip }}
 }
 track_script {
-check_haproxy
+check_kubeapi
 }
 }
