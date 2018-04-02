@@ -1,2 +1,6 @@
 ---
-  - include: worker_nodes.yml
+  # if you want to run k8s cluster with cri-containerd then run below
+  #- include: worker_nodes.yml
+
+  #if you want to run k8s cluster with docker then run below
+  #- include: worker_nodes_docker.yml

@@ -1,37 +1,13 @@
 ---
-  - name: copy script on local desk
+  - name: copy inventory file on local desk
     copy:
-      src: ip_script.sh
-      dest: /tmp/ip_script.sh
-      mode: 0755
-  - name: Get the Routing Table
-    local_action: shell ssh {{inventory_hostname}} '/tmp/ip_script.sh'
-
-  - name: create VXLAN interface for overlay network
+      src: /etc/ansible/hosts
+      dest: /tmp/hosts
+  - name: create route shell files
     shell: >
-           IP={{ansible_default_ipv4.address}};
-           VXLAN_CIDR=172.16.0.${IP##*.}/24;
-           cat /tmp/nodes-routes | grep -v {{ansible_default_ipv4.address}} > /tmp/other-nodes-routes;
-           VXLAN_D=$(awk '{print $1}' /tmp/other-nodes-routes);
-           ip link add vxlan0 type vxlan id 1 dstport 0;
-           for i in `cat /tmp/other-nodes-routes | awk {'print $1'}` ; 
-           do bridge fdb append to 00:00:00:00:00:00 dev vxlan0 dst $i;
-           done;
-           ip addr add $VXLAN_CIDR dev vxlan0;
-           ip link set up vxlan0;
-  - name: Add routes of cluster subnets through VXLAN interface
-    shell: >
-           IP={{ansible_default_ipv4.address}};
-           VXLAN_IP=`ifconfig  vxlan0 | grep inet | awk {'print $2'} | sed -e 's/addr://g' | sed -e '/^$/d'`;
-           IP_SUB=$(echo $IP  | cut -d'.' -f1-3);
-           VXLAN_SUB=$(echo $VXLAN_IP  | cut -d'.' -f1-3);
-           sed -i "s/$IP_SUB/$VXLAN_SUB/g" /tmp/other-nodes-routes;
-           for i in `cat /tmp/other-nodes-routes | awk {'print $1'}`;
-           do route add -net `cat /tmp/other-nodes-routes | grep $i | awk {'print $2'}` gw $i;
-           done
-           
+           more /tmp/hosts  | grep CIDR | grep -v `hostname` | awk {'print $3 " " $2'}  | sed -e 's/POD_CIDR=/route add -net /g' -e 's/host_ip=/gw /g' > /tmp/routes
 
-           
- 
-            
- 
+  - name: add these roules parmenently 
+    shell: >
+           sed -i -e '/# By default this script does nothing./r /tmp/routes' /etc/rc.local;
+           bash /etc.rc.local

@@ -19,6 +19,7 @@ Architecture Details of kubernetes cluster
                                 #   kube-apiserver             #
                                 #   kube-controller-manager    #
                                 #   kube-scheduler             #
+                                #   Keepalived                 #
                                 #                              #
                                 ################################
 
@@ -33,38 +34,46 @@ Architecture Details of kubernetes cluster
                                 #################################
                                       
 
-create six VMs ( RAM: 8GB , disk: 100GB , VCPUs: 4) in your openstack tenant, you can use any provisioning tool to create them.
+create six VMs ( RAM: 1GB , disk: 10GB, 24GB , VCPUs: 1) in your virtualBox
       
-       Hostname              Internal-IP           Floating/Public-IP
-       controller0           192.168.33.6          XX.XX.XX.YY
-       controller01          192.168.33.7          XX.XX.XX.YX
-       controller02          192.168.33.8          XX.XX.XX.XY
-       worker01              192.168.33.9          XX.XX.XX.XX
-       worker02              192.168.33.10         XX.XX.XX.XX
-       worker03              192.168.33.11         XX.XX.XX.XX
-       haproxy               192.168.33.5          XX.XX.XX.XX
+       Hostname              	Internal-IP          
+       master01           	192.168.44.10          
+       master02          	192.168.44.11        
+       master03          	192.168.44.12         
+       node01              	192.168.44.13          
+       node02              	192.168.44.14         
+       node03              	192.168.44.15         
 
 
 change hostname in your hosts inventroy file as per your setup.
 
 following variables will be used in each Roles of ansible
 
-    #vars/main.yml
+    #var_main.yml
 
-   ---
-   	lb_ip: 192.168.33.5         # LB internal IP
-   	ctl0_ip: 192.168.33.6
-	ctl1_ip: 192.168.33.7
-	ctl2_ip: 192.168.33.8
-	cluster_ip_range: 10.32.0.0/24  # cluster IP range for services
-	cluster_cidr: 10.200.0.0/16     # cluster CIDR for PODs on minion
-	public_ip: XX.XX.XX.XX          # floatin/public IP of haproxy for kube-apiserver access
-	cluster_dns: 10.32.0.10         # k8s cluster DNS IP
-	svc_ip: 10.32.0.1               # k8s kubernetes service IP
-	http_proxy: XX.XX.XX.XX         # proxy IP , if you are doing your setup behind http proxy      
-	ctl0_h: controller0
-	ctl1_h: controller01
-	ctl2_h: controller02
+        kub_version: v1.9.0
+	etcd_version: v3.2.11
+	cni_version: v0.6.0
+	cri_version: v1.0.0-beta.1
+	lb_ip: 192.168.44.5
+	ctl0_ip: 192.168.44.10
+	ctl1_ip: 192.168.44.11
+	ctl2_ip: 192.168.44.12
+	worker0_ip: 192.168.44.13
+	worker1_ip: 192.168.44.14
+	worker2_ip: 192.168.44.15
+	cluster_ip_range: 192.168.55.0/24
+	cluster_cidr: 10.200.0.0/16
+	public_ip: 192.168.44.5
+	cluster_dns: 192.168.55.10
+	svc_ip: 192.168.55.1
+	http_proxy: 192.168.44.5
+	ctl0_h: master01
+	ctl1_h: master02
+	ctl2_h: master03
+	worker0_h: node01
+	worker1_h: node02
+	worker2_h: node03
 
 # Setup Steps:
 Prerquisites:
@@ -111,7 +120,10 @@ Prerquisites:
 
 
   Afert this , chech etcd cluster status by login in any one master node
+   #export ETCDCTL_API=3 
+   #etcdctl member list
 
+  or
   #etcdctl --ca-file /etc/etcd/ca.pem --cert-file /etc/etcd/kubernetes.pem --key-file /etc/etcd/kubernetes-key.pem cluster-health
 
   #etcdctl --ca-file /etc/etcd/ca.pem --cert-file /etc/etcd/kubernetes.pem --key-file /etc/etcd/kubernetes-key.pem member list
@@ -140,82 +152,47 @@ Prerquisites:
 
     #curl --cacert ca.pem https://${PUBLIC_ADDRESS}:6443/version
   
-5)Bootstrapping a H/A etcd cluster and Kubernetes Control Plane
 
-    #ansible-playbook -i hosts kubernet_setup_master.yml
 
-6)setup kubctl client to check controller status
-
-    #ansible-playbook -i hosts -l controller0 kubernetes_client.yml
-    
-  Login controller0 node and run below command
-   
-    #kubectl get status
-
-  You can setup Kubernetes Client - on remaining controller nodes
-
-7)Bootstrapping Kubernetes Workers
+11)Bootstrapping Kubernetes Workers
 
     #ansible-playbook -i hosts kubernet_setup_worker.yml
 
- Login in any one controller node where you set up kubectl client, list certificates of worker node and approve it
- 
-    #kubectl get csr
 
-    #kubectl certificate approve cert-ID
-
-8)Configuring the Kubernetes Client - Remote Access ( this will setup kubectl on all nodes)
+12)Configuring the Kubernetes Client - Remote Access ( this will setup kubectl on all nodes)
 
     #ansible-playbook -i hosts  kubernetes_client.yml
 
-9)create overlay network to talk PODs across worker nodes ( I have used VXLAN )
+13) After Worker nodes are added please please check it status
 
-    #ansible-playbook -i hosts container_network_routes.yml
+    #kubectl get nodes   
 
-10)Added cluster DNS add on in k8s cluster
+14) if everything looks fine , here in this setup you will have to add static routes mannuly on each worker nodes ( here not using any container network solution)
+    
+     # ansible-playbook -i hosts container_network_routes.yml
 
-     #ansible-playbook -i hosts cluster_DNS_Add_on.yml
+15) Now cretae DNS service for k8s cluster , by login in any master node
 
-   Login any node and check
- 
-     #kubectl get svc -n kube-system
-       This will show kube-dns service details
+     #ssh master01 
+     # wget https://storage.googleapis.com/kubernetes-the-hard-way/kube-dns.yaml
+     # kubectl create -f kube-dns.yaml
 
-     #kubectl get pod -n kube-system
- 
-       This will show kube-dns pod details , this pod has 4 containers
-       To check DNS service is working or not, create one busybox pod
+     Check DNS pod and svc is up or not
+  
+    #kubectl get po --all-namespaces
+    #kubectl get svc  --all-namespaces
 
-     #kubectl run busybox  --image=busybox -- sleep 3600
-     #kubectl get pod -o wide
-        it will give details on which worker busybox pod is ruuning
-        Login in that worker and run that container and check nslokup
-    #docker exec -it contanier-id sh
-     nslookup kuberenetes.defaul.svc.cluster.local 
-        it should give 10.32.0.1 IP
-       
+      verify DNS service is working or not
 
-# 11)Smoke test
+     #kubectl run busybox --image=busybox --command -- sleep 3600
 
- 
-  Login in any client
-     
-    #kubectl run nginx --image=nginx --port=80 --replicas=3
-    #kubectl get pods -o wide
+     List the pod created by the busybox deployment:
 
-    #kubectl expose deployment nginx --type NodePort
+     #kubectl get pods -l run=busybox
 
-  Grab the NodePort that was setup for the nginx service:
+     Execute a DNS lookup for the kubernetes service inside the busybox pod:
 
-    #NODE_PORT=$(kubectl get svc nginx --output=jsonpath='{range .spec.ports[0]}{.nodePort}')
-
-  access nginix through internal and floating IP of worker
-
-    #curl http://worker01:${NODE_PORT}
-
-    #curl http://worker01-floatingip:${NODE_PORT}
-
- 
+    #kubectl exec -ti POD_NAME -- nslookup kubernetes 
 # Reference Links
 
   https://github.com/kelseyhightower/kubernetes-the-hard-way
@@ -227,6 +204,10 @@ Prerquisites:
   http://blog.arunsriraman.com/2017/02/how-to-setting-up-gre-or-vxlan-tunnel.html
   
   storage glusterFS:
+
+  https://github.com/heketi/heketi/blob/master/docs/admin/install-kubernetes.md
+
+  https://blog.lwolf.org/post/how-i-deployed-glusterfs-cluster-to-kubernetes/
   
   http://blog.leifmadsen.com/blog/2017/09/19/persistent-volumes-with-glusterfs/
   
